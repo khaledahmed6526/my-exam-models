@@ -7,7 +7,168 @@
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>اختيار المهمة وعرض الكود</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
+    background-color: #121212; /* خلفية داكنة */
+    color: #e0e0e0; /* لون نص فاتح */
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #90caf9; /* لون هيدر ناعم */
+  }
+  select, button, a.btn {
+    font-size: 1.1rem;
+    padding: 10px;
+    width: 100%;
+    max-width: 350px;
+    margin: 10px auto 30px auto;
+    display: block;
+    border-radius: 6px;
+    border: 1px solid #444;
+    outline: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    text-align: center;
+    text-decoration: none;
+  }
+  select:focus, button:hover, a.btn:hover {
+    background-color: #333;
+  }
+  #code-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #222; /* صندوق كود داكن */
+    border-radius: 8px;
+    padding: 15px;
+    color: #d4d4d4;
+    font-family: 'Courier New', Courier, monospace;
+    overflow-x: auto;
+    max-height: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.7);
+  }
+  pre {
+    margin: 0 0 20px 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  #open-colab {
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    max-width: 350px;
+    display: none;
+    margin: 0 auto 10px auto;
+  }
+  #open-colab:hover {
+    background-color: #357ae8;
+  }
+  #download-btn {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    max-width: 350px;
+    display: none;
+    margin: 0 auto 30px auto;
+  }
+  #download-btn:hover {
+    background-color: #27ae60;
+  }
+  #error-message {
+    color: #f44336;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h1>اختر المهمة لعرض الكود</h1>
+
+<select id="mission-select">
+  <option value="">-- اختر مهمة --</option>
+  <option value="Student_Exam_Performanc.ipynb">مهمة 1 - Student Exam Performance</option>
+  <option value="House_Prices.ipynb">مهمة 2 - House Prices</option>
+  <option value="Car.ipynb">مهمة 3 - Car</option>
+  <option value="Laptop_Prices.ipynb">مهمة 4 - Laptop Prices</option>
+  <option value="University.ipynb">مهمة 5 - University</option>
+  <option value="Diabetes.ipynb">مهمة 6 - Diabetes</option>
+  <option value="mission.ipynb">مهمة 7 - Mission</option>
+</select>
+
+<a id="open-colab" href="#" target="_blank">افتح المهمة في Google Colab</a>
+<a id="download-btn" href="#" download>تحميل الملف</a>
+
+<div id="code-container"></div>
+<div id="error-message"></div>
+
+<script>
+  const rawBaseURL = 'https://raw.githubusercontent.com/khaledahmed6526/my-exam-models/main/';
+  const colabBase = 'https://colab.research.google.com/github/khaledahmed6526/my-exam-models/blob/main/';
+
+  const selectEl = document.getElementById('mission-select');
+  const codeContainer = document.getElementById('code-container');
+  const openColabBtn = document.getElementById('open-colab');
+  const downloadBtn = document.getElementById('download-btn');
+  const errorMsg = document.getElementById('error-message');
+
+  selectEl.addEventListener('change', async () => {
+    const fileName = selectEl.value;
+    codeContainer.innerHTML = '';
+    errorMsg.textContent = '';
+    openColabBtn.style.display = 'none';
+    downloadBtn.style.display = 'none';
+    if (!fileName) return;
+
+    try {
+      const res = await fetch(rawBaseURL + fileName);
+      if (!res.ok) throw new Error('فشل تحميل الملف');
+
+      const notebook = await res.json();
+
+      // عرض كل خلايا الكود فقط
+      const codeCells = notebook.cells.filter(cell => cell.cell_type === 'code');
+
+      if (codeCells.length === 0) {
+        codeContainer.innerHTML = '<p>لا يوجد خلايا كود في هذا الملف.</p>';
+      } else {
+        codeCells.forEach((cell) => {
+          const pre = document.createElement('pre');
+          pre.textContent = cell.source.join('');
+          codeContainer.appendChild(pre);
+        });
+      }
+
+      // اظهار زر فتح كولاب
+      openColabBtn.href = colabBase + fileName;
+      openColabBtn.style.display = 'block';
+
+      // اظهار زر تحميل الملف
+      downloadBtn.href = rawBaseURL + fileName;
+      downloadBtn.download = fileName;
+      downloadBtn.style.display = 'block';
+
+    } catch (error) {
+      errorMsg.textContent = 'خطأ في تحميل الملف. تحقق من اتصالك أو اسم الملف.';
+      console.error(error);
+    }
+  });
+</script>
+
+</body>
+</html>
+
     background-color: #f0f4f8;
     color: #222;
   }
