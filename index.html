@@ -3,68 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>اختيار المشن</title>
+  <title>نماذج تدريبية</title>
   <style>
-    body { font-family: sans-serif; padding: 1rem; line-height: 1.5 }
-    select, a.button { font-size: 1rem; padding: 0.5rem; margin: 0.5rem 0 }
-    pre { background: #f5f5f5; border: 1px solid #ddd; padding: 1rem; overflow-x: auto }
-    a.button { display: inline-block; background: #4285F4; color: #fff; text-decoration: none; border-radius: 4px; }
+    body { font-family: sans-serif; padding: 1rem; line-height: 1.5; background-color: #f9f9f9; }
+    select, a.button { font-size: 1rem; padding: 0.5rem; margin: 0.5rem 0; width: 100%; max-width: 300px; }
+    a.button { display: inline-block; background: #2e7d32; color: #fff; text-decoration: none; border-radius: 4px; text-align: center; }
+    .note { color: #555; font-size: 0.9rem; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
-  <h1>اختار المشن</h1>
+  <h2>نماذج تدريبية لمهارات تحليل البيانات</h2>
+  <div class="note">اختر نموذجًا من القائمة لمراجعته في Google Colab</div>
 
   <select id="mission-select">
-    <option value="">-- اختر مهمة --</option>
-    <option value="Student_Exam_Performanc.ipynb">مهمة 1 - Student Exam Performance</option>
-    <option value="House_Prices.ipynb">مهمة 2 - House Prices</option>
-    <option value="Car.ipynb">مهمة 3 - Car</option>
-    <option value="Laptop_Prices.ipynb">مهمة 4 - Laptop Prices</option>
-    <option value="University.ipynb">مهمة 5 - University</option>
-    <option value="Diabetes.ipynb">مهمة 6 - Diabetes</option>
-    <option value="mission.ipynb">مهمة 7 - Mission</option>
+    <option value="">-- اختر نموذج --</option>
+    <option value="Student_Exam_Performanc.ipynb">نموذج 1</option>
+    <option value="House_Prices.ipynb">نموذج 2</option>
+    <option value="Car.ipynb">نموذج 3</option>
+    <option value="Laptop_Prices.ipynb">نموذج 4</option>
+    <option value="University.ipynb">نموذج 5</option>
+    <option value="Diabetes.ipynb">نموذج 6</option>
+    <option value="mission.ipynb">نموذج 7</option>
   </select>
 
   <div>
     <a id="open-colab" class="button" href="#" target="_blank" style="display:none">
-      افتح في Colab
+      فتح النموذج للدراسة
     </a>
   </div>
 
-  <div id="code-display"></div>
-
   <script>
-    const rawBase   = 'https://raw.githubusercontent.com/khaledahmed6526/my-exam-models/main/';
     const colabBase = 'https://colab.research.google.com/github/khaledahmed6526/my-exam-models/blob/main/';
-
     const select = document.getElementById('mission-select');
-    const codeDiv  = document.getElementById('code-display');
     const colabBtn = document.getElementById('open-colab');
 
-    select.addEventListener('change', async () => {
+    select.addEventListener('change', () => {
       const file = select.value;
-      codeDiv.innerHTML = '';
-      colabBtn.style.display = 'none';
-
-      if (!file) return;
-
-      try {
-        const res = await fetch(rawBase + file);
-        const nb  = await res.json();
-        nb.cells
-          .filter(c => c.cell_type === 'code')
-          .forEach((cell, i) => {
-            const pre = document.createElement('pre');
-            pre.textContent = cell.source.join('');
-            codeDiv.appendChild(pre);
-          });
-      } catch (e) {
-        codeDiv.textContent = 'خطأ في تحميل الملف.';
-        console.error(e);
-      }
-
+      colabBtn.style.display = file ? 'inline-block' : 'none';
       colabBtn.href = colabBase + file;
-      colabBtn.style.display = 'inline-block';
     });
   </script>
 </body>
