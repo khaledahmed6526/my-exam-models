@@ -8,24 +8,23 @@
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
-    background-color: #121212; /* خلفية داكنة */
-    color: #e0e0e0; /* لون نص فاتح */
+    background-color: #121212;
+    color: #e0e0e0;
   }
   h1 {
     text-align: center;
     margin-bottom: 20px;
-    color: #90caf9; /* لون هيدر ناعم */
+    color: #90caf9;
   }
-  select, button, a.btn {
+  select, .custom-btn {
     font-size: 1.1rem;
-    padding: 10px;
+    padding: 12px;
     width: 100%;
     max-width: 350px;
-    margin: 10px auto 30px auto;
+    margin: 10px auto;
     display: block;
     border-radius: 6px;
-    border: 1px solid #444;
-    outline: none;
+    border: none;
     cursor: pointer;
     transition: background-color 0.3s ease;
     background-color: #1e1e1e;
@@ -33,13 +32,13 @@
     text-align: center;
     text-decoration: none;
   }
-  select:focus, button:hover, a.btn:hover {
+  select:focus, .custom-btn:hover {
     background-color: #333;
   }
   #code-container {
     max-width: 900px;
-    margin: 0 auto;
-    background: #222; /* صندوق كود داكن */
+    margin: 20px auto;
+    background: #222;
     border-radius: 8px;
     padding: 15px;
     color: #d4d4d4;
@@ -52,28 +51,6 @@
     margin: 0 0 20px 0;
     white-space: pre-wrap;
     word-wrap: break-word;
-  }
-  #open-colab {
-    background-color: #4285f4;
-    color: white;
-    border: none;
-    max-width: 350px;
-    display: none;
-    margin: 0 auto 10px auto;
-  }
-  #open-colab:hover {
-    background-color: #357ae8;
-  }
-  #download-btn {
-    background-color: #2ecc71;
-    color: white;
-    border: none;
-    max-width: 350px;
-    display: none;
-    margin: 0 auto 30px auto;
-  }
-  #download-btn:hover {
-    background-color: #27ae60;
   }
   #error-message {
     color: #f44336;
@@ -98,8 +75,9 @@
   <option value="mission.ipynb">مهمة 7 - Mission</option>
 </select>
 
-<a id="open-colab" href="#" target="_blank">افتح المهمة في Google Colab</a>
-<a id="download-btn" href="#" download>تحميل الملف</a>
+<a id="open-colab" href="#" target="_blank" class="custom-btn" style="display: none;">افتح المهمة في Google Colab</a>
+<a id="download-btn" href="#" download class="custom-btn" style="display: none;">تحميل الملف</a>
+<button id="toggle-code" class="custom-btn" style="display: none;">إخفاء الكود</button>
 
 <div id="code-container"></div>
 <div id="error-message"></div>
@@ -112,7 +90,10 @@
   const codeContainer = document.getElementById('code-container');
   const openColabBtn = document.getElementById('open-colab');
   const downloadBtn = document.getElementById('download-btn');
+  const toggleCodeBtn = document.getElementById('toggle-code');
   const errorMsg = document.getElementById('error-message');
+
+  let codeVisible = true;
 
   selectEl.addEventListener('change', async () => {
     const fileName = selectEl.value;
@@ -120,6 +101,8 @@
     errorMsg.textContent = '';
     openColabBtn.style.display = 'none';
     downloadBtn.style.display = 'none';
+    toggleCodeBtn.style.display = 'none';
+
     if (!fileName) return;
 
     try {
@@ -128,7 +111,6 @@
 
       const notebook = await res.json();
 
-      // عرض كل خلايا الكود فقط
       const codeCells = notebook.cells.filter(cell => cell.cell_type === 'code');
 
       if (codeCells.length === 0) {
@@ -139,14 +121,19 @@
           pre.textContent = cell.source.join('');
           codeContainer.appendChild(pre);
         });
+        toggleCodeBtn.style.display = 'block';
+        toggleCodeBtn.textContent = 'إخفاء الكود';
+        codeVisible = true;
       }
 
-      // اظهار زر فتح كولاب
+      // فتح كولاب
       openColabBtn.href = colabBase + fileName;
       openColabBtn.style.display = 'block';
 
-      // اظهار زر تحميل الملف
-      downloadBtn.href = rawBaseURL + fileName;
+      // تحميل مباشر
+      const fileBlob = await fetch(rawBaseURL + fileName).then(res => res.blob());
+      const blobUrl = URL.createObjectURL(fileBlob);
+      downloadBtn.href = blobUrl;
       downloadBtn.download = fileName;
       downloadBtn.style.display = 'block';
 
@@ -154,6 +141,12 @@
       errorMsg.textContent = 'خطأ في تحميل الملف. تحقق من اتصالك أو اسم الملف.';
       console.error(error);
     }
+  });
+
+  toggleCodeBtn.addEventListener('click', () => {
+    codeVisible = !codeVisible;
+    codeContainer.style.display = codeVisible ? 'block' : 'none';
+    toggleCodeBtn.textContent = codeVisible ? 'إخفاء الكود' : 'عرض الكود';
   });
 </script>
 
